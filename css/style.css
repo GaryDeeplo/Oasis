@@ -1360,12 +1360,17 @@ blockquote {
   justify-content: space-between;
   align-items: center;
   max-width: 1440px;
-  min-height: 50px;
+  height: 80px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 80px;
   padding-right: 80px;
   display: flex;
+}
+
+.navbar-wrapper .company-logo img {
+  max-height: 56px;
+  width: auto;
 }
 
 .section-services {
