@@ -352,8 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ==========================================================================
    * 6. GOOGLE MAPS PLACEHOLDER
    * Elements with .w-widget-map have data-widget-latlng and aria-label.
-   * Without the Webflow Maps API key we embed a free OpenStreetMap iframe
-   * or show a clickable fallback linking to Google Maps.
+   * Uses free Google Maps Embed iframe (no API key required).
    * ========================================================================== */
 
   (function initMaps() {
@@ -377,14 +376,14 @@ document.addEventListener('DOMContentLoaded', function () {
       mapEl.style.position = 'relative';
       mapEl.style.width = '100%';
 
-      // Create an OpenStreetMap embed iframe (free, no API key required)
-      var bbox = calculateBbox(parseFloat(lat), parseFloat(lng), parseInt(zoom, 10));
+      // Google Maps Embed iframe (free, no API key)
       var iframe = document.createElement('iframe');
       iframe.setAttribute('width', '100%');
       iframe.setAttribute('height', '100%');
       iframe.setAttribute('frameborder', '0');
-      iframe.setAttribute('scrolling', 'no');
+      iframe.setAttribute('allowfullscreen', '');
       iframe.setAttribute('loading', 'lazy');
+      iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
       iframe.setAttribute('title', label || 'Map');
       iframe.style.position = 'absolute';
       iframe.style.top = '0';
@@ -392,43 +391,12 @@ document.addEventListener('DOMContentLoaded', function () {
       iframe.style.width = '100%';
       iframe.style.height = '100%';
       iframe.style.border = '0';
-      iframe.src = 'https://www.openstreetmap.org/export/embed.html?bbox=' +
-        bbox + '&layer=mapnik&marker=' + lat + ',' + lng;
-
-      // Fallback link in case iframe fails
-      var fallbackLink = document.createElement('a');
-      fallbackLink.href = 'https://www.google.com/maps/search/?api=1&query=' +
-        encodeURIComponent(lat + ',' + lng);
-      fallbackLink.target = '_blank';
-      fallbackLink.rel = 'noopener noreferrer';
-      fallbackLink.textContent = 'Voir sur Google Maps' + (label ? ' - ' + label : '');
-      fallbackLink.style.cssText =
-        'display:block;text-align:center;padding:8px;font-size:14px;' +
-        'color:#0066cc;text-decoration:underline;position:relative;z-index:1;';
+      iframe.src = 'https://maps.google.com/maps?q=' + lat + ',' + lng +
+        '&z=' + zoom + '&output=embed';
 
       mapEl.innerHTML = '';
       mapEl.appendChild(iframe);
-      mapEl.appendChild(fallbackLink);
     });
-
-    /**
-     * Calculate a bounding box for the OpenStreetMap embed based on lat/lng
-     * and an approximate zoom level.
-     */
-    function calculateBbox(lat, lng, zoom) {
-      // Rough degrees per zoom level (at equator, halves per zoom level)
-      var degreesPerZoom = 360 / Math.pow(2, zoom);
-      var latDelta = degreesPerZoom / 2;
-      var lngDelta = degreesPerZoom;
-
-      var south = lat - latDelta;
-      var north = lat + latDelta;
-      var west = lng - lngDelta;
-      var east = lng + lngDelta;
-
-      return west.toFixed(6) + ',' + south.toFixed(6) + ',' +
-             east.toFixed(6) + ',' + north.toFixed(6);
-    }
   })();
 
 
