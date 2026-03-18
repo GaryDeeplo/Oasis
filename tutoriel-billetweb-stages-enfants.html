@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutoriel Billetweb — Créer un stage pour enfants | L'Oasis Familiale</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #2D6A4F;
+            --primary-light: #40916C;
+            --primary-bg: #F0F7F4;
+            --accent: #E76F51;
+            --accent-light: #FFF1ED;
+            --dark: #1B1B1B;
+            --gray-700: #374151;
+            --gray-500: #6B7280;
+            --gray-300: #D1D5DB;
+            --gray-100: #F3F4F6;
+            --white: #FFFFFF;
+            --warning: #F59E0B;
+            --warning-bg: #FFFBEB;
+            --info: #3B82F6;
+            --info-bg: #EFF6FF;
+            --success: #10B981;
+            --success-bg: #ECFDF5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark);
+            line-height: 1.7;
+            background: var(--white);
+            font-size: 15px;
+        }
+
+        /* Print styles */
+        @media print {
+            body { font-size: 12px; }
+            .page-break { page-break-before: always; }
+            .no-print { display: none; }
+            .cover { page-break-after: always; }
+            section { page-break-inside: avoid; }
+            .step-card { page-break-inside: avoid; }
+            .screenshot-placeholder { border: 2px dashed #ccc; }
+        }
+
+        /* Cover page */
+        .cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--white);
+            text-align: center;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .cover::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 50%;
+        }
+
+        .cover-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .cover .subtitle {
+            font-size: 20px;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover .org-name {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.7;
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 30px;
+            margin-top: 20px;
+        }
+
+        .cover .version {
+            font-size: 13px;
+            opacity: 0.5;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        /* Table of contents */
+        .toc {
+            background: var(--gray-100);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+
+        .toc h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc-counter;
+        }
+
+        .toc > ol > li {
+            counter-increment: toc-counter;
+            margin-bottom: 12px;
+        }
+
+        .toc > ol > li > a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .toc > ol > li > a:hover {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        .toc > ol > li > a::before {
+            content: counter(toc-counter, decimal-leading-zero);
+            font-weight: 700;
+            color: var(--primary);
+            margin-right: 16px;
+            font-size: 14px;
+            min-width: 30px;
+        }
+
+        /* Section headings */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .section-number {
+            background: var(--primary);
+            color: var(--white);
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.3;
+        }
+
+        section {
+            margin-bottom: 64px;
+        }
+
+        /* Step cards */
+        .step-card {
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            position: relative;
+            transition: box-shadow 0.2s;
+        }
+
+        .step-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .step-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-badge {
+            background: var(--primary-bg);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-card p,
+        .step-card li {
+            color: var(--gray-700);
+            margin-bottom: 10px;
+        }
+
+        .step-card ul, .step-card ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .step-card li {
+            margin-bottom: 8px;
+        }
+
+        /* Screenshot placeholder */
+        .screenshot-placeholder {
+            background: var(--gray-100);
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 40px 24px;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--gray-500);
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .screenshot-placeholder .icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .screenshot-placeholder .label {
+            font-weight: 600;
+            color: var(--gray-700);
+            font-style: normal;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Alert boxes */
+        .alert {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-content strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .alert-warning {
+            background: var(--warning-bg);
+            border-left: 4px solid var(--warning);
+        }
+
+        .alert-info {
+            background: var(--info-bg);
+            border-left: 4px solid var(--info);
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-tip {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+        }
+
+        /* Navigation path */
+        .nav-path {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--gray-100);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin: 8px 0;
+            font-family: 'Inter', monospace;
+        }
+
+        .nav-path .sep {
+            color: var(--gray-500);
+            font-weight: 400;
+        }
+
+        /* Field description */
+        .field-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--gray-300);
+        }
+
+        .field-table thead th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .field-table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .field-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .field-table tbody tr:nth-child(even) {
+            background: var(--gray-100);
+        }
+
+        .field-name {
+            font-weight: 600;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .field-required {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Inline code */
+        code {
+            background: var(--primary-bg);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Emphasis box */
+        .emphasis-box {
+            background: var(--primary-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .emphasis-box h4 {
+            color: var(--primary);
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 8px 0 8px 36px;
+            position: relative;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 8px;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        /* Numbered workflow */
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 24px 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+        }
+
+        .workflow-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .workflow-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .workflow-line {
+            width: 2px;
+            flex: 1;
+            background: var(--gray-300);
+            margin-top: 8px;
+        }
+
+        .workflow-step:last-child .workflow-line {
+            display: none;
+        }
+
+        .workflow-content h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .workflow-content p {
+            color: var(--gray-700);
+            font-size: 14px;
+        }
+
+        /* Example box */
+        .example-box {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, #e8f5e9 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .example-box .example-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .example-box p {
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--gray-300);
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 30px 20px; }
+            .cover h1 { font-size: 28px; }
+            .section-header h2 { font-size: 22px; }
+        }
+
+        /* Highlight text */
+        mark {
+            background: #FEF3C7;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+
+        /* Divider */
+        hr {
+            border: none;
+            border-top: 2px solid var(--gray-100);
+            margin: 40px 0;
+        }
+
+        /* Quick ref sidebar */
+        .quick-ref {
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .quick-ref h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+
+        .quick-ref ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .quick-ref li {
+            padding: 6px 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .quick-ref li strong {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== COVER PAGE ========== -->
+<div class="cover">
+    <div class="cover-icon">🎟️</div>
+    <h1>Guide Billetweb</h1>
+    <div class="subtitle">Créer et gérer une billetterie<br>pour les stages enfants</div>
+    <div class="org-name">L'Oasis Familiale — Centre d'Accueil des Enfants</div>
+    <div class="version">Version 1.0 — Mars 2026</div>
+</div>
+
+<!-- ========== MAIN CONTENT ========== -->
+<div class="container">
+
+    <!-- Table of contents -->
+    <nav class="toc">
+        <h2>Sommaire</h2>
+        <ol>
+            <li><a href="#intro">Introduction & Accès à Billetweb</a></li>
+            <li><a href="#creer">Créer un nouvel événement (stage)</a></li>
+            <li><a href="#infos">Configurer les informations du stage</a></li>
+            <li><a href="#tarifs">Créer les tarifs et catégories de billets</a></li>
+            <li><a href="#formulaire">Personnaliser le formulaire d'inscription</a></li>
+            <li><a href="#design">Personnaliser l'apparence de la page</a></li>
+            <li><a href="#paiement">Configurer les options de paiement</a></li>
+            <li><a href="#publier">Publier et partager le stage</a></li>
+            <li><a href="#gerer">Gérer les inscriptions au quotidien</a></li>
+            <li><a href="#jourj">Le jour J — Contrôle des entrées</a></li>
+            <li><a href="#dupliquer">Dupliquer un stage pour la prochaine session</a></li>
+            <li><a href="#checklist">Checklist avant publication</a></li>
+        </ol>
+    </nav>
+
+    <!-- ==================== SECTION 1 ==================== -->
+    <section id="intro">
+        <div class="section-header">
+            <div class="section-number">01</div>
+            <h2>Introduction & Accès à Billetweb</h2>
+        </div>
+
+        <p>Billetweb est la plateforme de billetterie en ligne que L'Oasis Familiale utilise pour gérer les inscriptions aux stages pour enfants (Centre de Vacances, ateliers, etc.). Ce guide vous accompagne pas à pas dans la création d'un événement.</p>
+
+        <div class="quick-ref">
+            <h4>Accès rapide</h4>
+            <ul>
+                <li><strong>URL du back-office :</strong> https://www.billetweb.fr/bo/</li>
+                <li><strong>Connexion :</strong> Utilisez vos identifiants Oasis</li>
+                <li><strong>Coût :</strong> ≈ 0,29 € + 1 % par billet vendu (pas d'abonnement)</li>
+                <li><strong>Support :</strong> support@billetweb.fr</li>
+            </ul>
+        </div>
+
+        <div class="step-card">
+            <h3>Se connecter au back-office</h3>
+            <ol>
+                <li>Ouvrez votre navigateur et rendez-vous sur <strong>billetweb.fr</strong></li>
+                <li>Cliquez sur <strong>"Connexion"</strong> en haut à droite</li>
+                <li>Entrez votre <strong>adresse e-mail</strong> et votre <strong>mot de passe</strong></li>
+                <li>Vous arrivez sur le <strong>tableau de bord</strong> qui liste tous vos événements</li>
+            </ol>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Page de connexion Billetweb</span>
+                Insérer ici une capture de l'écran de connexion
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div class="alert-content">
+                <strong>Bon à savoir</strong>
+                Si vous avez perdu votre mot de passe, cliquez sur "Mot de passe oublié" sur la page de connexion. Un lien de réinitialisation vous sera envoyé par e-mail.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 2 ==================== -->
+    <section id="creer" class="page-break">
+        <div class="section-header">
+            <div class="section-number">02</div>
+            <h2>Créer un nouvel événement (stage)</h2>
+        </div>
+
+        <p>Chaque stage pour enfants correspond à un <strong>événement</strong> sur Billetweb. Voici comment en créer un nouveau.</p>
+
+        <div class="step-card">
+            <h3>Étape 1 — Lancer la création</h3>
+            <p>Depuis le tableau de bord :</p>
+            <ol>
+                <li>Cliquez sur le bouton <strong>"+ Créer un événement"</strong> (généralement en haut à droite ou au centre de la page)</li>
+                <li>Un assistant de création s'ouvre</li>
+            </ol>
+
+            <div class="nav-path">
+                Tableau de bord <span class="sep">›</span> + Créer un événement
+            </div>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Bouton "Créer un événement" sur le tableau de bord</span>
+                Insérer ici une capture du tableau de bord avec le bouton mis en évidence
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h3>Étape 2 — Choisir le type d'événement</h3>
+            <p>Billetweb peut proposer différents types (concert, conférence, activité…). Pour un stage enfants :</p>
+            <ul>
+                <li>Choisissez le type le plus adapté : <strong>"Activité"</strong>, <strong>"Stage"</strong> ou <strong>"Atelier"</strong> selon les options disponibles</li>
+                <li>Si aucun type ne correspond exactement, choisissez <strong>"Autre"</strong></li>
+            </ul>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Sélection du type d'événement</span>
+                Insérer ici une capture de la sélection du type
+            </div>
+        </div>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">🔥</span>
+            <div class="alert-content">
+                <strong>Astuce — Gagner du temps</strong>
+                Si un stage similaire existe déjà, vous pouvez le <strong>dupliquer</strong> au lieu de tout recréer. Voir la <a href="#dupliquer">Section 11</a>.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 3 ==================== -->
+    <section id="infos" class="page-break">
+        <div class="section-header">
+            <div class="section-number">03</div>
+            <h2>Configurer les informations du stage</h2>
+        </div>
+
+        <p>C'est le cœur de votre événement : les informations que les parents verront sur la page publique.</p>
+
+        <div class="step-card">
+            <h3>Informations principales</h3>
+
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Quoi mettre</th>
+                        <th>Exemple</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-name">Titre</span> <span class="field-required">obligatoire</span></td>
+                        <td>Nom clair du stage, incluant la semaine ou la période</td>
+                        <td>Stage Enfants — Semaine 1 (Juillet 2026)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Date de début</span> <span class="field-required">obligatoire</span></td>
+                        <td>Premier jour du stage</td>
+                        <td>06/07/2026</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Date de fin</span> <span class="field-required">obligatoire</span></td>
+                        <td>Dernier jour du stage</td>
+                        <td>10/07/2026</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Heure de début</span></td>
+                        <td>Heure d'accueil des enfants</td>
+                        <td>08:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Heure de fin</span></td>
+                        <td>Heure de récupération</td>
+                        <td>16:30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Lieu</span> <span class="field-required">obligatoire</span></td>
+                        <td>Adresse complète du lieu d'accueil</td>
+                        <td>Rue de Wavre 22B, 4280 Hannut</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Description</span> <span class="field-required">obligatoire</span></td>
+                        <td>Présentation détaillée du stage (activités, âge, repas, matériel…)</td>
+                        <td>Voir exemple ci-dessous</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Image / Visuel</span></td>
+                        <td>Affiche ou photo attractive du stage (format recommandé : 1200×630 px)</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Formulaire d'informations principales</span>
+                Insérer ici une capture du formulaire rempli avec les infos du stage
+            </div>
+        </div>
+
+        <div class="example-box">
+            <div class="example-label">Exemple de description type</div>
+            <p><strong>🌿 Stage d'été — L'Oasis Familiale</strong></p>
+            <p style="margin-top: 10px;">
+                L'Oasis Familiale organise un stage d'été pour les enfants de <strong>3 à 12 ans</strong> durant les vacances scolaires.
+            </p>
+            <p style="margin-top: 8px;">
+                <strong>Au programme :</strong> activités créatives, jeux en plein air, bricolage, sport, découverte de la nature et moments de détente.
+            </p>
+            <p style="margin-top: 8px;">
+                <strong>Infos pratiques :</strong><br>
+                • Accueil dès 8h30, fin à 16h30<br>
+                • Garderie possible de 7h30 à 8h30 et de 16h30 à 17h30<br>
+                • Prévoir un pique-nique, des collations et des vêtements adaptés<br>
+                • Inscription à la journée ou à la semaine
+            </p>
+            <p style="margin-top: 8px;">
+                <strong>Contact :</strong> Nancy Jacques — accueilenfants@oasisfamiliale.be
+            </p>
+        </div>
+
+        <div class="alert alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-content">
+                <strong>Important — Visuel</strong>
+                L'image est la première chose que les parents verront. Utilisez une photo lumineuse et attrayante en lien avec les activités du stage. Évitez les images floues ou trop chargées en texte.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 4 ==================== -->
+    <section id="tarifs" class="page-break">
+        <div class="section-header">
+            <div class="section-number">04</div>
+            <h2>Créer les tarifs et catégories de billets</h2>
+        </div>
+
+        <p>C'est ici que vous définissez les différentes formules d'inscription au stage. Vous pouvez créer autant de tarifs que nécessaire.</p>
+
+        <div class="nav-path">
+            Événement <span class="sep">›</span> Billetterie <span class="sep">›</span> Tarifs
+        </div>
+
+        <div class="step-card">
+            <h3>Ajouter un tarif</h3>
+            <ol>
+                <li>Dans la page de votre événement, allez dans l'onglet <strong>"Billetterie"</strong> ou <strong>"Tarifs"</strong></li>
+                <li>Cliquez sur <strong>"Ajouter un tarif"</strong></li>
+                <li>Remplissez les champs suivants :</li>
+            </ol>
+
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-name">Nom du tarif</span></td>
+                        <td>Ex : "Stage Semaine complète", "Stage 1 journée", "Garderie matin"</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Prix</span></td>
+                        <td>Le montant TTC. Mettez <strong>0 €</strong> si le stage est gratuit.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Quantité disponible</span></td>
+                        <td>Le nombre maximum de places (ex : 20 enfants par semaine)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Description</span></td>
+                        <td>Détails du tarif (ce qui est inclus, âge concerné…)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Dates de vente</span></td>
+                        <td>Période pendant laquelle ce tarif est disponible à la vente (optionnel)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Nombre min/max par commande</span></td>
+                        <td>Limitez si besoin (ex : max 5 billets par commande pour éviter les abus)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Création d'un tarif</span>
+                Insérer ici une capture du formulaire de création de tarif
+            </div>
+        </div>
+
+        <div class="emphasis-box">
+            <h4>Exemple de tarifs pour un stage enfants</h4>
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Tarif</th>
+                        <th>Prix</th>
+                        <th>Places</th>
+                        <th>Détail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-name">Semaine complète (3-6 ans)</span></td>
+                        <td>75 €</td>
+                        <td>15</td>
+                        <td>Du lundi au vendredi, 8h30-16h30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Semaine complète (6-12 ans)</span></td>
+                        <td>85 €</td>
+                        <td>20</td>
+                        <td>Du lundi au vendredi, 8h30-16h30</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Journée unique</span></td>
+                        <td>20 €</td>
+                        <td>5</td>
+                        <td>Inscription à la journée (dans la limite des places)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Option garderie (semaine)</span></td>
+                        <td>15 €</td>
+                        <td>15</td>
+                        <td>Accueil étendu 7h30-8h30 et 16h30-17h30</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div class="alert-content">
+                <strong>Gestion des quotas</strong>
+                Billetweb gère automatiquement les places restantes. Quand un tarif est complet, il s'affiche comme <strong>"Complet"</strong> et les parents ne peuvent plus le sélectionner. Vous pouvez toujours augmenter le quota manuellement si une place se libère.
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-content">
+                <strong>Commission Billetweb</strong>
+                Si le billet est payant, Billetweb prélève une commission d'environ <strong>0,29 € + 1 %</strong> par billet. Vous pouvez choisir de l'absorber (incluse dans votre prix) ou de la répercuter sur le parent (ajoutée au prix affiché). Configurez cela dans les <a href="#paiement">options de paiement</a>.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 5 ==================== -->
+    <section id="formulaire" class="page-break">
+        <div class="section-header">
+            <div class="section-number">05</div>
+            <h2>Personnaliser le formulaire d'inscription</h2>
+        </div>
+
+        <p>Le formulaire permet de collecter les informations nécessaires sur l'enfant et le parent. C'est essentiel pour les stages enfants.</p>
+
+        <div class="nav-path">
+            Événement <span class="sep">›</span> Billetterie <span class="sep">›</span> Formulaire
+        </div>
+
+        <div class="step-card">
+            <h3>Ajouter des champs personnalisés</h3>
+            <p>Par défaut, Billetweb demande le nom et l'e-mail de l'acheteur. Pour un stage enfants, vous devez ajouter des champs supplémentaires :</p>
+
+            <ol>
+                <li>Allez dans la section <strong>"Formulaire"</strong> de votre événement</li>
+                <li>Cliquez sur <strong>"Ajouter un champ"</strong></li>
+                <li>Choisissez le type de champ (texte, liste déroulante, case à cocher…)</li>
+                <li>Renseignez le libellé et indiquez si le champ est obligatoire</li>
+            </ol>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Configuration du formulaire personnalisé</span>
+                Insérer ici une capture de la page de gestion du formulaire
+            </div>
+        </div>
+
+        <div class="emphasis-box">
+            <h4>Champs recommandés pour un stage enfants</h4>
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Champ</th>
+                        <th>Type</th>
+                        <th>Obligatoire</th>
+                        <th>Pourquoi ?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-name">Prénom de l'enfant</span></td>
+                        <td>Texte</td>
+                        <td>Oui</td>
+                        <td>Identification de l'enfant</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Nom de l'enfant</span></td>
+                        <td>Texte</td>
+                        <td>Oui</td>
+                        <td>Identification de l'enfant</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Date de naissance</span></td>
+                        <td>Date</td>
+                        <td>Oui</td>
+                        <td>Vérifier l'âge et le groupe</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Nom du parent / responsable</span></td>
+                        <td>Texte</td>
+                        <td>Oui</td>
+                        <td>Contact principal</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Numéro de téléphone</span></td>
+                        <td>Téléphone</td>
+                        <td>Oui</td>
+                        <td>Joindre le parent en cas d'urgence</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Allergies / régime alimentaire</span></td>
+                        <td>Texte long</td>
+                        <td>Non</td>
+                        <td>Sécurité et santé de l'enfant</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Problèmes de santé à signaler</span></td>
+                        <td>Texte long</td>
+                        <td>Non</td>
+                        <td>Précautions médicales</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Personne à contacter en urgence</span></td>
+                        <td>Texte</td>
+                        <td>Oui</td>
+                        <td>Contact alternatif</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Autorisation de droit à l'image</span></td>
+                        <td>Case à cocher</td>
+                        <td>Non</td>
+                        <td>RGPD — photos pendant le stage</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Acceptation du règlement</span></td>
+                        <td>Case à cocher</td>
+                        <td>Oui</td>
+                        <td>Conditions générales du stage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">🔥</span>
+            <div class="alert-content">
+                <strong>Astuce — Champs par billet</strong>
+                Si un parent inscrit plusieurs enfants, configurez les champs pour qu'ils soient demandés <strong>par billet</strong> (et non par commande). Ainsi, chaque enfant aura sa propre fiche. Vérifiez l'option <strong>"Demander pour chaque billet"</strong> ou <strong>"Par participant"</strong> selon la formulation Billetweb.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 6 ==================== -->
+    <section id="design" class="page-break">
+        <div class="section-header">
+            <div class="section-number">06</div>
+            <h2>Personnaliser l'apparence de la page</h2>
+        </div>
+
+        <p>Donnez une identité visuelle à votre page de billetterie pour rassurer les parents et renforcer l'image de L'Oasis Familiale.</p>
+
+        <div class="nav-path">
+            Événement <span class="sep">›</span> Personnalisation
+        </div>
+
+        <div class="step-card">
+            <h3>Éléments visuels à configurer</h3>
+            <ul>
+                <li><strong>Image de couverture / bannière :</strong> photo principale affichée en haut de la page. Utilisez une photo d'enfants en activité ou l'affiche du stage (idéalement 1200 × 630 px).</li>
+                <li><strong>Logo :</strong> ajoutez le logo de L'Oasis Familiale pour crédibiliser la page.</li>
+                <li><strong>Couleurs :</strong> personnalisez les couleurs du thème pour correspondre à la charte graphique de L'Oasis (vert, couleurs naturelles…).</li>
+                <li><strong>Description riche :</strong> vous pouvez mettre en forme le texte (gras, listes, liens) et ajouter des images dans la description.</li>
+            </ul>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Options de personnalisation visuelle</span>
+                Insérer ici une capture des réglages d'apparence
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div class="alert-content">
+                <strong>Prévisualisation</strong>
+                Avant de publier, utilisez toujours le bouton <strong>"Prévisualiser"</strong> pour voir la page telle que les parents la verront. Vérifiez le rendu sur mobile (la majorité des parents consulteront depuis leur téléphone).
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 7 ==================== -->
+    <section id="paiement" class="page-break">
+        <div class="section-header">
+            <div class="section-number">07</div>
+            <h2>Configurer les options de paiement</h2>
+        </div>
+
+        <p>Définissez comment les parents pourront régler l'inscription de leur enfant.</p>
+
+        <div class="nav-path">
+            Événement <span class="sep">›</span> Billetterie <span class="sep">›</span> Paiement
+        </div>
+
+        <div class="step-card">
+            <h3>Moyens de paiement disponibles</h3>
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Moyen</th>
+                        <th>Description</th>
+                        <th>Recommandation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-name">Carte bancaire</span></td>
+                        <td>Visa, Mastercard — paiement sécurisé en ligne</td>
+                        <td>Activez-le (le plus utilisé)</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Virement</span></td>
+                        <td>Le parent paie par virement et vous validez manuellement</td>
+                        <td>Optionnel, utile si certains parents n'ont pas de carte</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Sur place / espèces</span></td>
+                        <td>Réservation en ligne, paiement le jour du stage</td>
+                        <td>Utile pour les familles précarisées</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">PayPal</span></td>
+                        <td>Paiement via compte PayPal</td>
+                        <td>Optionnel</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Configuration des moyens de paiement</span>
+                Insérer ici une capture de la configuration des paiements
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h3>Gestion des frais de commission</h3>
+            <p>Vous avez deux options pour les frais Billetweb :</p>
+            <ul>
+                <li><strong>Absorber les frais :</strong> Vous recevez le prix du billet moins la commission. Le parent paie le prix affiché. <mark>Recommandé pour L'Oasis</mark></li>
+                <li><strong>Répercuter les frais :</strong> La commission est ajoutée au prix du billet. Le parent paie un peu plus que le prix affiché.</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <div class="alert-content">
+                <strong>Bonne nouvelle</strong>
+                Si le stage est <strong>gratuit</strong> (prix à 0 €), Billetweb ne prélève <strong>aucune commission</strong>. La plateforme est entièrement gratuite pour les événements gratuits.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 8 ==================== -->
+    <section id="publier" class="page-break">
+        <div class="section-header">
+            <div class="section-number">08</div>
+            <h2>Publier et partager le stage</h2>
+        </div>
+
+        <p>Une fois tout configuré, il est temps de rendre la billetterie accessible aux parents.</p>
+
+        <div class="step-card">
+            <h3>Publication de l'événement</h3>
+            <ol>
+                <li>Vérifiez toutes les informations via le bouton <strong>"Prévisualiser"</strong></li>
+                <li>Si tout est correct, cliquez sur <strong>"Publier"</strong> ou activez la vente en ligne</li>
+                <li>Billetweb génère automatiquement une <strong>URL publique</strong> pour votre événement</li>
+            </ol>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Bouton de publication et URL générée</span>
+                Insérer ici une capture montrant la publication et le lien
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h3>Partager la billetterie</h3>
+            <p>Plusieurs canaux pour diffuser l'inscription :</p>
+
+            <div class="workflow">
+                <div class="workflow-step">
+                    <div class="workflow-marker">
+                        <div class="workflow-dot">1</div>
+                        <div class="workflow-line"></div>
+                    </div>
+                    <div class="workflow-content">
+                        <h4>Lien direct</h4>
+                        <p>Copiez l'URL de l'événement et partagez-la par <strong>e-mail, SMS, ou messagerie</strong> (WhatsApp, Messenger…). C'est le moyen le plus simple.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-marker">
+                        <div class="workflow-dot">2</div>
+                        <div class="workflow-line"></div>
+                    </div>
+                    <div class="workflow-content">
+                        <h4>Réseaux sociaux</h4>
+                        <p>Partagez le lien sur la <strong>page Facebook de L'Oasis Familiale</strong> et sur Instagram. Billetweb propose des boutons de partage intégrés.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-marker">
+                        <div class="workflow-dot">3</div>
+                        <div class="workflow-line"></div>
+                    </div>
+                    <div class="workflow-content">
+                        <h4>Intégration sur le site web</h4>
+                        <p>Billetweb fournit un <strong>code d'intégration (widget)</strong> que vous pouvez ajouter directement sur le site web de L'Oasis Familiale pour que les parents s'inscrivent sans quitter le site.</p>
+                    </div>
+                </div>
+                <div class="workflow-step">
+                    <div class="workflow-marker">
+                        <div class="workflow-dot">4</div>
+                        <div class="workflow-line"></div>
+                    </div>
+                    <div class="workflow-content">
+                        <h4>QR Code / Affiche</h4>
+                        <p>Générez un <strong>QR code</strong> pointant vers la page d'inscription et intégrez-le sur les affiches physiques et flyers distribués à Hannut et Waremme.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Options de partage (lien, widget, QR code)</span>
+                Insérer ici une capture des options de partage
+            </div>
+        </div>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">🔥</span>
+            <div class="alert-content">
+                <strong>Astuce — Communication</strong>
+                Communiquez l'ouverture des inscriptions <strong>au moins 3 à 4 semaines</strong> avant le début du stage. Faites des rappels réguliers, surtout quand les places commencent à se remplir : le message <em>"Plus que 5 places disponibles !"</em> est très efficace.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 9 ==================== -->
+    <section id="gerer" class="page-break">
+        <div class="section-header">
+            <div class="section-number">09</div>
+            <h2>Gérer les inscriptions au quotidien</h2>
+        </div>
+
+        <p>Une fois la billetterie en ligne, voici comment suivre et gérer les inscriptions des enfants.</p>
+
+        <div class="nav-path">
+            Tableau de bord <span class="sep">›</span> Votre événement <span class="sep">›</span> Participants
+        </div>
+
+        <div class="step-card">
+            <h3>Tableau de bord de l'événement</h3>
+            <p>En cliquant sur votre événement depuis le tableau de bord, vous accédez à :</p>
+            <ul>
+                <li><strong>Statistiques en temps réel :</strong> nombre d'inscriptions, revenus, taux de remplissage</li>
+                <li><strong>Liste des participants :</strong> nom, e-mail, tarif choisi, statut du paiement</li>
+                <li><strong>Détails de chaque inscription :</strong> toutes les informations du formulaire (enfant, parent, allergies, etc.)</li>
+            </ul>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Tableau de bord de l'événement avec statistiques</span>
+                Insérer ici une capture du dashboard de l'événement
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h3>Exporter la liste des inscrits</h3>
+            <p>Pour préparer le stage, vous aurez besoin de la liste complète :</p>
+            <ol>
+                <li>Allez dans <strong>"Participants"</strong> ou <strong>"Liste des inscrits"</strong></li>
+                <li>Cliquez sur <strong>"Exporter"</strong></li>
+                <li>Choisissez le format <strong>Excel (.xlsx) ou CSV</strong></li>
+                <li>Le fichier contient tous les champs du formulaire : parfait pour faire les listes de groupes, préparer les badges nominatifs ou lister les allergies</li>
+            </ol>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Bouton d'export de la liste des participants</span>
+                Insérer ici une capture du bouton d'export
+            </div>
+        </div>
+
+        <div class="step-card">
+            <h3>Actions courantes</h3>
+            <table class="field-table">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Comment faire</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="field-name">Rembourser un parent</span></td>
+                        <td>Cliquez sur la commande du participant → <strong>"Rembourser"</strong>. Vous pouvez rembourser partiellement ou totalement.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Ajouter un inscrit manuellement</span></td>
+                        <td>Utile si un parent s'inscrit par téléphone ou sur place. Utilisez <strong>"Ajouter une commande"</strong> pour créer l'inscription manuellement.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Envoyer un e-mail aux participants</span></td>
+                        <td>Allez dans <strong>"Communication"</strong> → <strong>"Envoyer un message"</strong>. Vous pouvez écrire à tous les inscrits ou filtrer par tarif.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Modifier un quota</span></td>
+                        <td>Retournez dans les tarifs et augmentez/diminuez le nombre de places disponibles si nécessaire.</td>
+                    </tr>
+                    <tr>
+                        <td><span class="field-name">Annuler un billet</span></td>
+                        <td>Cliquez sur la commande → <strong>"Annuler"</strong>. La place est alors libérée.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="alert alert-info">
+            <span class="alert-icon">💡</span>
+            <div class="alert-content">
+                <strong>Notifications automatiques</strong>
+                Billetweb envoie automatiquement un <strong>e-mail de confirmation</strong> à chaque parent après inscription, avec le récapitulatif et le billet/QR code. Vous n'avez rien à faire !
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 10 ==================== -->
+    <section id="jourj" class="page-break">
+        <div class="section-header">
+            <div class="section-number">10</div>
+            <h2>Le jour J — Contrôle des entrées</h2>
+        </div>
+
+        <p>Le premier jour du stage, vous pouvez vérifier les inscriptions de plusieurs manières.</p>
+
+        <div class="step-card">
+            <h3>Option 1 — Liste imprimée (le plus simple)</h3>
+            <ol>
+                <li>Exportez la liste des inscrits la veille (voir section précédente)</li>
+                <li>Imprimez-la</li>
+                <li>Cochez les enfants à leur arrivée</li>
+            </ol>
+            <p>C'est la méthode la plus adaptée pour un stage enfants de taille modeste.</p>
+        </div>
+
+        <div class="step-card">
+            <h3>Option 2 — Contrôle sur ordinateur</h3>
+            <ol>
+                <li>Connectez-vous à Billetweb depuis un ordinateur ou une tablette</li>
+                <li>Ouvrez la <strong>page de contrôle</strong> de l'événement</li>
+                <li>Cochez les enfants au fur et à mesure de leur arrivée</li>
+            </ol>
+        </div>
+
+        <div class="step-card">
+            <h3>Option 3 — Application mobile (scan QR code)</h3>
+            <ol>
+                <li>Téléchargez l'application <strong>Billetweb</strong> sur votre smartphone (iOS / Android)</li>
+                <li>Connectez-vous avec vos identifiants</li>
+                <li>Scannez le <strong>QR code</strong> du billet que le parent présente sur son téléphone ou en version imprimée</li>
+                <li>L'application confirme la validité et marque l'entrée</li>
+            </ol>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Application mobile Billetweb pour le scan</span>
+                Insérer ici une capture de l'application mobile (optionnel)
+            </div>
+        </div>
+
+        <div class="alert alert-success">
+            <span class="alert-icon">✅</span>
+            <div class="alert-content">
+                <strong>Recommandation pour L'Oasis</strong>
+                Pour des stages de 15-20 enfants, la <strong>liste imprimée</strong> est amplement suffisante et la plus pratique. Le scan QR est surtout utile pour les grands événements (100+ personnes).
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 11 ==================== -->
+    <section id="dupliquer" class="page-break">
+        <div class="section-header">
+            <div class="section-number">11</div>
+            <h2>Dupliquer un stage pour la prochaine session</h2>
+        </div>
+
+        <p>Lorsque vous organisez un nouveau stage similaire (ex : Semaine 2 d'été), inutile de tout recréer. Dupliquez l'événement existant !</p>
+
+        <div class="step-card">
+            <h3>Comment dupliquer un événement</h3>
+            <ol>
+                <li>Depuis le <strong>tableau de bord</strong>, repérez le stage que vous souhaitez dupliquer</li>
+                <li>Cliquez sur les <strong>3 petits points</strong> (menu d'options) ou sur l'icône de duplication à côté de l'événement</li>
+                <li>Sélectionnez <strong>"Dupliquer"</strong></li>
+                <li>Un nouvel événement est créé avec toutes les mêmes informations (description, tarifs, formulaire, design)</li>
+                <li>Modifiez uniquement ce qui change :
+                    <ul>
+                        <li><strong>Titre</strong> (ex : "Semaine 2" au lieu de "Semaine 1")</li>
+                        <li><strong>Dates</strong></li>
+                        <li><strong>Quotas</strong> (les compteurs sont remis à zéro)</li>
+                        <li><strong>Visuel</strong> si nécessaire</li>
+                    </ul>
+                </li>
+                <li>Publiez le nouvel événement</li>
+            </ol>
+
+            <div class="screenshot-placeholder">
+                <span class="icon">📸</span>
+                <span class="label">Capture d'écran : Option de duplication d'un événement</span>
+                Insérer ici une capture montrant l'option de duplication
+            </div>
+        </div>
+
+        <div class="alert alert-tip">
+            <span class="alert-icon">🔥</span>
+            <div class="alert-content">
+                <strong>Workflow recommandé pour les vacances d'été</strong>
+                Créez le premier stage en détail, puis dupliquez-le pour chaque semaine suivante. Cela vous assure une cohérence entre les stages et vous fait gagner un temps considérable.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== SECTION 12 ==================== -->
+    <section id="checklist" class="page-break">
+        <div class="section-header">
+            <div class="section-number">12</div>
+            <h2>Checklist avant publication</h2>
+        </div>
+
+        <p>Avant de mettre votre billetterie en ligne, vérifiez tous les points suivants :</p>
+
+        <div class="step-card">
+            <h3>Informations générales</h3>
+            <ul class="checklist">
+                <li>Le <strong>titre</strong> est clair et contient la période (ex : "Stage Été — Semaine 1")</li>
+                <li>Les <strong>dates et horaires</strong> sont corrects</li>
+                <li>L'<strong>adresse</strong> est complète et exacte (Rue de Wavre 22B, 4280 Hannut)</li>
+                <li>La <strong>description</strong> mentionne : les activités, la tranche d'âge, les infos pratiques (repas, matériel…)</li>
+                <li>Un <strong>visuel attractif</strong> est ajouté</li>
+            </ul>
+        </div>
+
+        <div class="step-card">
+            <h3>Tarifs et places</h3>
+            <ul class="checklist">
+                <li>Tous les <strong>tarifs</strong> sont créés avec les bons prix</li>
+                <li>Le <strong>nombre de places</strong> est correct pour chaque tarif</li>
+                <li>Les <strong>dates de vente</strong> sont configurées (si nécessaire)</li>
+                <li>La <strong>commission</strong> Billetweb est gérée (absorbée ou répercutée)</li>
+            </ul>
+        </div>
+
+        <div class="step-card">
+            <h3>Formulaire d'inscription</h3>
+            <ul class="checklist">
+                <li>Les champs <strong>enfant</strong> sont présents (prénom, nom, date de naissance)</li>
+                <li>Le <strong>téléphone du parent</strong> est demandé</li>
+                <li>Les <strong>allergies / santé</strong> sont demandés</li>
+                <li>Le <strong>contact d'urgence</strong> est demandé</li>
+                <li>Les champs sont bien configurés <strong>par billet/participant</strong></li>
+            </ul>
+        </div>
+
+        <div class="step-card">
+            <h3>Vérification finale</h3>
+            <ul class="checklist">
+                <li>La <strong>prévisualisation</strong> est vérifiée (version desktop ET mobile)</li>
+                <li>Un <strong>test d'inscription</strong> a été réalisé (inscrivez-vous vous-même pour tester le parcours)</li>
+                <li>L'<strong>e-mail de confirmation</strong> est bien reçu après le test</li>
+                <li>Le <strong>paiement</strong> fonctionne correctement</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <div class="alert-content">
+                <strong>N'oubliez pas de supprimer votre inscription test !</strong>
+                Après avoir vérifié que tout fonctionne, pensez à annuler/supprimer la commande test pour ne pas fausser vos statistiques et libérer la place.
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== AIDE / FAQ ==================== -->
+    <section class="page-break">
+        <div class="section-header">
+            <div class="section-number">?</div>
+            <h2>Questions fréquentes</h2>
+        </div>
+
+        <div class="step-card">
+            <h3>Un parent veut s'inscrire mais n'a pas accès à internet ?</h3>
+            <p>Vous pouvez l'inscrire manuellement depuis le back-office : <strong>Participants → Ajouter une commande</strong>. Vous remplirez le formulaire à sa place et pourrez encaisser le paiement en espèces ou par virement.</p>
+        </div>
+
+        <div class="step-card">
+            <h3>Un parent souhaite annuler, comment le rembourser ?</h3>
+            <p>Allez dans la liste des participants, cliquez sur sa commande, puis sur <strong>"Rembourser"</strong>. Le remboursement est traité automatiquement si le paiement avait été fait par carte. Pour les paiements en espèces, procédez au remboursement manuellement et marquez la commande comme annulée.</p>
+        </div>
+
+        <div class="step-card">
+            <h3>Comment modifier un événement déjà publié ?</h3>
+            <p>Vous pouvez modifier à tout moment les informations, les tarifs, les quotas et le formulaire d'un événement publié. Les changements sont <strong>appliqués immédiatement</strong>. Attention : si des inscriptions sont déjà enregistrées, ne modifiez pas les tarifs existants (créez-en de nouveaux si besoin).</p>
+        </div>
+
+        <div class="step-card">
+            <h3>Comment recevoir les paiements ?</h3>
+            <p>Billetweb verse les montants collectés sur votre compte bancaire, généralement sous <strong>15 jours</strong> après la transaction. Assurez-vous que vos coordonnées bancaires sont correctement renseignées dans les paramètres de votre compte organisateur.</p>
+        </div>
+
+        <div class="step-card">
+            <h3>Où trouver de l'aide ?</h3>
+            <p>Le support Billetweb est joignable par e-mail à <strong>support@billetweb.fr</strong>. Leur documentation en ligne est également très complète : <strong>billetweb.fr/fr-fr/questions-frequentes/</strong></p>
+        </div>
+    </section>
+
+    <!-- ==================== FOOTER ==================== -->
+    <div class="footer">
+        <p><strong>L'Oasis Familiale</strong> — Rue de Wavre 22B, 4280 Hannut</p>
+        <p>Ce guide a été créé pour faciliter la gestion des stages enfants via Billetweb.</p>
+        <p style="margin-top: 8px; opacity: 0.6;">Document interne — Mars 2026</p>
+    </div>
+
+</div>
+
+</body>
+</html>
